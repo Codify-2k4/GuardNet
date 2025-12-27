@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GuardNet Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #121212; color: #e0e0e0; }
+        .card { background-color: #1e1e1e; border: 1px solid #333; }
+        .table { color: #e0e0e0; }
+        .status-malicious { color: #ff4d4d; font-weight: bold; }
+        .status-normal { color: #00cc66; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4"><span class="text-primary">GuardNet</span> Live Monitor</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5>Active Model</h5>
+                    <p id="model-name" class="h6 text-info">Loading...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <h5>Normal Traffic</h5>
+                    <h2 id="count-normal" class="text-success">0</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <h5>Threats Detected</h5>
+                    <h2 id="count-malicious" class="text-danger">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                Recent Network Traffic
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-dark table-striped mb-0">
+                    <thead>
+    <tr>
+        <th>Packet ID</th>
+        <th>Time</th>
+        <th>Info</th>
+        <th>Decision Source</th> <th>Status</th>
+    </tr>
+</thead>
+                    <tbody id="logs-body">
+                        <tr><td colspan="5" class="text-center text-muted">Waiting for traffic...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateDashboard() {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    // 1. Update Model Name
+                    document.getElementById('model-name').innerText = data.model_name;
+
+                    // 2. Update Counters
+                    document.getElementById('count-normal').innerText = data.stats.normal;
+                    document.getElementById('count-malicious').innerText = data.stats.malicious;
+
+                    // 3. Update Table
+                    const tbody = document.getElementById('logs-body');
+                    if (data.logs.length > 0) {
+                        tbody.innerHTML = ""; // Clear existing rows
+                        data.logs.forEach(log => {
+                            const statusClass = log.status === 'Malicious' ? 'status-malicious' : 'status-normal';
+                            const row = `
+        <tr>
+            <td>#${log.id}</td>
+            <td>${log.time}</td>
+            <td>${log.info}</td>
+            <td><span class="badge bg-secondary">${log.source}</span></td>
+            <td class="${statusClass}">${log.status}</td>
+        </tr>
+    `;
+                            tbody.innerHTML += row;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Poll API every 1 second
+        setInterval(updateDashboard, 1000);
+        updateDashboard(); // Initial call
+    </script>
+</body>
+</html>

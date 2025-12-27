@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  guardnet-ai:
+    build: .
+    container_name: guardnet_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data  # Mount data for persistence
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - guardnet-net
+
+networks:
+  guardnet-net:
+    driver: bridge
