@@ -5,6 +5,10 @@ import numpy as np
 import tensorflow as tf
 from src.utils.logger import setup_logger
 from datetime import datetime
+<<<<<<< HEAD
+=======
+from src.core.sentinel import sentinel
+>>>>>>> 5dbcbb5 (First commit)
 
 app = Flask(__name__)
 logger = setup_logger("webapp")
@@ -106,7 +110,13 @@ def analyze_packet():
             confidence = 1.0 - (min_dist / 5.0)
 
         # Update Stats & Logs
+<<<<<<< HEAD
         if status == "Malicious": STATS["malicious"] += 1
+=======
+        if status == "Malicious": 
+            STATS["malicious"] += 1
+            sentinel.log_threat(data)
+>>>>>>> 5dbcbb5 (First commit)
         else: STATS["normal"] += 1
         
         log_entry = {
@@ -127,4 +137,8 @@ def analyze_packet():
         return jsonify({"error": "Invalid Data Format"}), 400
 
 if __name__ == '__main__':
+<<<<<<< HEAD
+=======
+    sentinel.start()
+>>>>>>> 5dbcbb5 (First commit)
     app.run(host='0.0.0.0', port=5000)

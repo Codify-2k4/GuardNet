@@ -10,7 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the source code
 COPY src/ ./src/
+<<<<<<< HEAD
 COPY data/ ./data/
+=======
+>>>>>>> 5dbcbb5 (First commit)
 
 # Set Python path so modules can be imported
 ENV PYTHONPATH=/app
